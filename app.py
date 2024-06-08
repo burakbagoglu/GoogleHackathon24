@@ -22,7 +22,7 @@ def Encrypte(sifre):
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-
+        ########LOGIN PAGE#############
         self.login_page_width = 500
         self.login_page_height = 400
         self.register_page_width = 600
@@ -57,11 +57,21 @@ class App(ctk.CTk):
         self.register_button = ctk.CTkButton(self.login_frame,text="Giriş",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100)
         self.register_button.place(x=240,y=130)
 
-        ####################################################
-        #Menü
-        ####################################################
+        #############REGISTER PAGE ONE ############
+        
+
+        self.register_page_one = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
+
+        self.bagisci_tik = ctk.CTkCheckBox(self.register_page_one,text="",fg_color="#528b8b",checkbox_height=18,checkbox_width=18,corner_radius=36)
+        
+        def show_register_page():
+            self.login_frame.pack_forget()
+            self.geometry(f"{self.register_page_width}x{self.register_page_height}")
+            self.register_page_one.pack(fill="both", expand=True)
+        #############MAIN MENU PAGE###########
         self.main_manu_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
+        
         
     def login(self):
         email = self.login_email_entry.get()
