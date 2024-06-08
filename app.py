@@ -8,14 +8,11 @@ from PIL import Image
 import random
 from datetime import datetime
 from tkinter import ttk, messagebox
-
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
 im = vt.cursor()
 im.execute("CREATE TABLE IF NOT EXISTS users ('id','ad','soyad','durum','ulke','sehir','ilce','oncelik_puanı')")
 im.execute("CREATE TABLE IF NOT EXISTS yemekler ('id','yemek_adi','yemek_sahibi','yemek_alan','kac_tabak')")
-
-
 
 app = CTk()
 
