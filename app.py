@@ -54,7 +54,7 @@ class App(ctk.CTk):
         self.login_button = ctk.CTkButton(self.login_frame,text="Giriş",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=self.login)
         self.login_button.place(x=120,y=130)
 
-        self.register_button = ctk.CTkButton(self.login_frame,text="Giriş",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100)
+        self.register_button = ctk.CTkButton(self.login_frame,text="Kayıt Ol",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=show_register_page)
         self.register_button.place(x=240,y=130)
 
         #############REGISTER PAGE ONE ############
