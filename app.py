@@ -8,7 +8,6 @@ from PIL import Image
 import random
 from datetime import datetime
 from tkinter import ttk, messagebox
-import locale
 
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
@@ -16,7 +15,7 @@ im = vt.cursor()
 im.execute("CREATE TABLE IF NOT EXISTS users ('id','ad','soyad','durum','ulke','sehir','ilce','oncelik_puanı')")
 im.execute("CREATE TABLE IF NOT EXISTS yemekler ('id','yemek_adi','yemek_sahibi','yemek_alan','kac_tabak')")
 
-locale.setlocale(locale.LC_ALL, '')
+
 
 app = CTk()
 
@@ -581,6 +580,19 @@ class App(ctk.CTk):
 
         ###############################################################################################################3
     def login(self):
+        def getYemek():
+            im.execute("SELECT COUNT(*) FROM yemekler")
+            satirsayisi = int(im.fetchone()[0])
+            im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
+            for i in range(satirsayisi):
+                a = im.fetchone()
+                alindimi = None
+                if a[5] == 0:
+                    alindimi = "Hayır"
+                elif a[5] == 1:
+                    alindimi = "Evet"
+                yemeklerim.insert("", "end", values=(a[0],a[1],alindimi,a[7]))
+                
         email = self.login_email_entry.get()
         password = self.login_password_entry.get()
 
@@ -600,6 +612,8 @@ class App(ctk.CTk):
                                             border_color="#5D0358",
                                             border_width=2,)
         cikisyap_button.place(x=550,y=10)
+
+        
         ##############BAĞIŞÇI MENÜ################
         self.main_manu_bagisci_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
         im.execute("SELECT * FROM users WHERE email = ?",(email,))
@@ -645,6 +659,7 @@ class App(ctk.CTk):
                 vt.commit()
                 yemek_ekle_window.destroy()
                 
+                
 
             menuye_don_butonu=CTkButton(yemek_ekle_window,text="Ekle",font=("Arial",16),command=close_window)
             menuye_don_butonu.pack()
@@ -674,39 +689,7 @@ class App(ctk.CTk):
         istatiklerim_label = ctk.CTkLabel(self.main_manu_bagisci_frame,text="İstatiklerim",font=("Arial",24))
         istatiklerim_label.place(x=10,y=260)
 
-        yemeklerim = ttk.Treeview(self.main_manu_bagisci_frame)
-        yemeklerim["columns"] = ("ID", "Yemek Adı", "Alındı mı")
-
-        yemeklerim.heading("#0", text="ID"),
-        yemeklerim.heading("ID", text="ID")
-        yemeklerim.heading("Yemek Adı", text="Yemek Adı")
-        yemeklerim.heading("Alındı mı", text="Alındı mı")
-
-        yemeklerim.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
-        for column in yemeklerim["columns"]:
-            yemeklerim.column(column, width=90, stretch=False)
-        yemeklerim.pack()
-        yemeklerim.place(x=10,y=380)
-
-        yemeklerim_style = ttk.Style()
-        yemeklerim_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
-        yemeklerim_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
-        yemeklerim_style.configure("Treeview", background="black")
-        yemeklerim_style.configure("Treeview", foreground="black")
-        yemeklerim_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
-
-        im.execute("SELECT COUNT(*) FROM yemekler")
-        satirsayisi = int(im.fetchone()[0])
-        im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
         
-        for i in range(satirsayisi):
-            a = im.fetchone()
-            alindimi = None
-            if a[5] == 0:
-                alindimi = "Hayır"
-            elif a[5] == 1:
-                alindimi = "Evet"
-            yemeklerim.insert("", "end", values=(a[0],a[1],alindimi,))
 
         ####################################################
         giris = False
@@ -733,8 +716,38 @@ class App(ctk.CTk):
                     self.geometry(f"{self.main_page_width}x{self.main_page_height}")
                     self.main_manu_ihtiyacsahibi_frame.pack(fill="both", expand=True)
 
+        def clear_treeview():
+            # Treeview içindeki tüm öğeleri silme
+            for item in yemeklerim.get_children():
+                yemeklerim.delete(item)
+
+        yemeklerim = ttk.Treeview(self.main_manu_bagisci_frame)
+        yemeklerim["columns"] = ("ID", "Yemek Adı", "Alındı mı","Tarih")
+
+        yemeklerim.heading("#0", text="ID"),
+        yemeklerim.heading("ID", text="ID")
+        yemeklerim.heading("Yemek Adı", text="Yemek Adı")
+        yemeklerim.heading("Alındı mı", text="Alındı mı")
+        yemeklerim.heading("Tarih", text="Tarih")
+
+        yemeklerim.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
+        for column in yemeklerim["columns"]:
+            yemeklerim.column(column, width=110, stretch=False)
+        yemeklerim.pack()
+        yemeklerim.place(x=10,y=380)
+
+        yemeklerim_style = ttk.Style()
+        yemeklerim_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
+        yemeklerim_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
+        yemeklerim_style.configure("Treeview", background="black")
+        yemeklerim_style.configure("Treeview", foreground="black")
+        yemeklerim_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
+
+        im.execute("SELECT COUNT(*) FROM yemekler")
+        satirsayisi = int(im.fetchone()[0])
+        im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
         
-    
+        getYemek()    
 
     ##KAYIT SAYFASINA GECİŞ
     def show_register_page(self):
