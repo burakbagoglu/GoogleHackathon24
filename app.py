@@ -30,8 +30,24 @@ def CreateID(table):
         veri = im.fetchone()
         if veri == x:
             x += 1
-
     return x
+
+def getSehirler():
+    sehirler = []
+    im.execute("SELECT name FROM sehirler")
+    for i in range(81):
+        a = str(im.fetchone()[0])
+        sehirler.append(a.capitalize())
+    return sehirler
+
+def getIlceler(sehir):
+    ilceler = []
+    im.execute("SELECT counties FROM sehirler WHERE name = ?",(str(sehir).lower(),))
+    ilce = str(im.fetchone()[0]).split(",")    
+    for i in ilce:
+        ilceler.append(i.capitalize())
+    return ilceler
+getIlceler("Manisa")
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -97,7 +113,7 @@ class App(ctk.CTk):
         self.register_page_one = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
         
         self.bagisci_tik = ctk.CTkCheckBox(self.register_page_one,
-                                           text="Bağışçı",
+                                           text="Bağışçıyım",
                                            variable=bagisci,
                                            font=("Arial",20),
                                            fg_color="#528b8b",
@@ -109,7 +125,7 @@ class App(ctk.CTk):
     
         self.ihtiyacsahibi_tik = ctk.CTkCheckBox(self.register_page_one,
                                                  variable=ihtiyacsahibi,
-                                                 text="İhtiyaç Sahibi",
+                                                 text="İhtiyaç Sahibiyim",
                                                  font=("Arial",20),
                                                  fg_color="#528b8b",
                                                  checkbox_height=80,
@@ -137,7 +153,9 @@ class App(ctk.CTk):
                                              width=100,
                                              command=get_checkbox_data)
         self.next_page_to_two_button.place(x=400,y=350)
-        ###KAYIT 2. SAYFA BAĞIŞÇI
+
+        ##############################################KAYIT 2. SAYFA BAĞIŞÇI################################################
+        
         self.register_page_two_bagisci = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
         
         #bağışçı isim
@@ -189,22 +207,46 @@ class App(ctk.CTk):
         bagisci_tekrar_sifre_entry= CTkEntry(self.register_page_two_bagisci, show="*")
         bagisci_tekrar_sifre_entry.place(x=90,y=210)
 
+        #kvkk onay
+        kvkk= CTkLabel(self.register_page_two_bagisci,text="Kullanım şartlarını ve KVKK metnini okuduğumu onaylıyorum",font=("Arial",15 ))
+        kvkk.place(relx=0.02,rely=0.71)
 
-        label9= CTkLabel(self.register_page_two_bagisci,text="Kullanım şartlarını ve KVKK metnini okuduğumu onaylıyorum",font=("Arial",15 ))
-        label9.place(relx=0.02,rely=0.71)
+        kvkk_check=CTkCheckBox(self.register_page_two_bagisci,text="",fg_color="#528b8b",checkbox_height=18,checkbox_width=18,corner_radius=36,)
+        kvkk_check.place(relx=0.81,rely=0.72)
 
-        checkbox=CTkCheckBox(self.register_page_two_bagisci,text="",fg_color="#528b8b",checkbox_height=18,checkbox_width=18,corner_radius=36,)
-        checkbox.place(relx=0.81,rely=0.72)
+        canvas = ctk.CTkCanvas(self.register_page_two_bagisci,width=0.05,height=260)
+        canvas.place(x=320,y=20)
 
+        
+        combobox_var = ctk.StringVar(value="Eskişehir")
 
-        ###KAYIT 2. SAYFA BAĞIŞÇI
+        def combobox_callback(choice):
+            ilceler_list = getIlceler(choice)
+            ilceler_cbox = ctk.CTkComboBox(self.register_page_two_bagisci,
+                                           values=ilceler_list,
+                                           state="readonly",
+                                           variable=ilceler_list[0]
+                                           )
+            ilceler_cbox.place(x=340,y=50)
+
+        sehirler_cbox = ctk.CTkComboBox(self.register_page_two_bagisci,
+                                        values=getSehirler(),
+                                        state="readonly",
+                                        command=combobox_callback,
+                                        variable=combobox_var)
+        sehirler_cbox.place(x=340,y=10)
+        
+        register_button = 
+        
+        
+        ###KAYIT 2. SAYFA İHTİYAÇ SAHİBİ
         self.register_page_two_ihtiyacsahibi = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
 
 
         #############MAIN MENU PAGE###########
         self.main_manu_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
-        
+    
         
     def login(self):
         email = self.login_email_entry.get()
