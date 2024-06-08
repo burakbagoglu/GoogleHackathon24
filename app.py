@@ -8,13 +8,25 @@ from PIL import Image
 import random
 from datetime import datetime
 from tkinter import ttk, messagebox
+import locale
+
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
 im = vt.cursor()
 im.execute("CREATE TABLE IF NOT EXISTS users ('id','ad','soyad','durum','ulke','sehir','ilce','oncelik_puanı')")
 im.execute("CREATE TABLE IF NOT EXISTS yemekler ('id','yemek_adi','yemek_sahibi','yemek_alan','kac_tabak')")
 
+locale.setlocale(locale.LC_ALL, '')
+
 app = CTk()
+
+def TarihiCek():
+    now = datetime.now()
+    return datetime.strftime(now, '%d %B %Y %H:%M')
+
+def AyCek():
+    x = TarihiCek().split(" ")
+    return x[1]
 
 def Encrypte(sifre):
     sha256 = hashlib.sha256()
@@ -607,7 +619,15 @@ class App(ctk.CTk):
             def close_window():
                 yemek_ismi = yemek_giren_entry.get()
                 kac_tabak = kac_tabak_giren_entry.get()
-                im.execute("INSERT INTO yemekler VALUES (?,?,?,?,?,?,?)",(CreateFoodID(),yemek_ismi,kullanici_veriler[0],None,kac_tabak,False,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
+                im.execute("INSERT INTO yemekler VALUES (?,?,?,?,?,?,?,?)",(CreateFoodID(),
+                                                                          yemek_ismi,
+                                                                          kullanici_veriler[0],
+                                                                          None,
+                                                                          kac_tabak,
+                                                                          False,
+                                                                          f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",
+                                                                          TarihiCek(),
+                                                                          ))
                 vt.commit()
                 yemek_ekle_window.destroy()
                 
@@ -634,9 +654,11 @@ class App(ctk.CTk):
                                             border_width=2)
                                         #TODO çıkış yapma foknsiyonu
         cikisyap_button.place(x=550,y=10)
-
-        istatiklerim_label = ctk.CTkLabel(self.main_manu_bagisci_frame,text="İstatiklerim",font=("Arial",14))
-        istatiklerim_label.place(x=10,y=300)
+        urun_ekle_canvas = ctk.CTkCanvas(self.main_manu_bagisci_frame,width=1000, height=0.1)
+        urun_ekle_canvas.pack()
+        urun_ekle_canvas.place(x=0,y=310)
+        istatiklerim_label = ctk.CTkLabel(self.main_manu_bagisci_frame,text="İstatiklerim",font=("Arial",24))
+        istatiklerim_label.place(x=10,y=260)
 
         yemeklerim = ttk.Treeview(self.main_manu_bagisci_frame)
         yemeklerim["columns"] = ("ID", "Yemek Adı", "Alındı mı")
@@ -645,6 +667,32 @@ class App(ctk.CTk):
         yemeklerim.heading("ID", text="ID")
         yemeklerim.heading("Yemek Adı", text="Yemek Adı")
         yemeklerim.heading("Alındı mı", text="Alındı mı")
+
+        yemeklerim.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
+        for column in yemeklerim["columns"]:
+            yemeklerim.column(column, width=90, stretch=False)
+        yemeklerim.pack()
+        yemeklerim.place(x=10,y=380)
+
+        yemeklerim_style = ttk.Style()
+        yemeklerim_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
+        yemeklerim_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
+        yemeklerim_style.configure("Treeview", background="black")
+        yemeklerim_style.configure("Treeview", foreground="black")
+        yemeklerim_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
+
+        im.execute("SELECT COUNT(*) FROM yemekler")
+        satirsayisi = int(im.fetchone()[0])
+        im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
+        
+        for i in range(satirsayisi):
+            a = im.fetchone()
+            alindimi = None
+            if a[5] == 0:
+                alindimi = "Hayır"
+            elif a[5] == 1:
+                alindimi = "Evet"
+            yemeklerim.insert("", "end", values=(a[0],a[1],alindimi,))
 
         ####################################################
         giris = False
