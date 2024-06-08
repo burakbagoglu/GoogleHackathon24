@@ -6,7 +6,8 @@ import sqlite3 as sql
 import hashlib
 from PIL import Image
 import random
-
+from datetime import datetime
+from tkinter import ttk, messagebox
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
 im = vt.cursor()
@@ -27,6 +28,18 @@ def CreateID():
 
     x = random.randint(11111111,99999999)
     im.execute(f"SELECT id FROM users")
+    for i in range(sutun):
+        veri = im.fetchone()
+        if veri == x:
+            x += 1
+    return x
+
+def CreateFoodID():
+    im.execute(f"SELECT COUNT(*) FROM users")
+    sutun = im.fetchone()[0]
+
+    x = random.randint(111111,999999)
+    im.execute(f"SELECT id FROM yemekler")
     for i in range(sutun):
         veri = im.fetchone()
         if veri == x:
@@ -61,6 +74,19 @@ def iki_sayi_araliga_sigdir(sayi1, min1, max1, min2, max2):
     except ValueError as e:
         return str(e)
 
+def karsilama_mesaji():
+    suan = datetime.now().time()
+    suan_saat = suan.hour
+
+    if 5 <= suan_saat < 12:
+        return "Günaydın"
+    elif 12 <= suan_saat < 18:
+        return "İyi öğlenler"
+    elif 18 <= suan_saat < 23:
+        return "İyi akşamlar"
+    else:
+        return "İyi geceler"
+    
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -513,14 +539,17 @@ class App(ctk.CTk):
 
         register_button2 = ctk.CTkButton(self.register_page_three_ihtiyacsahibi,text="Kaydı Tamamla",command=complete_register)
         register_button2.place(x=420,y=310)
-        #############BAGIŞÇI MENU PAGE###########
-        self.main_manu_bagisci_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
+
 
         
-    
-        ###############İHTİYAÇ SAHİBİ MENÜ##########
-        self.main_manu_ihtiyacsahibi_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
+        #############BAGIŞÇI MENU PAGE###########
+        
 
+
+    
+       
+
+        
 
 
 
@@ -529,6 +558,95 @@ class App(ctk.CTk):
         email = self.login_email_entry.get()
         password = self.login_password_entry.get()
 
+        ###############İHTİYAÇ SAHİBİ MENÜ##########
+        self.main_manu_ihtiyacsahibi_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
+        im.execute("SELECT * FROM users WHERE email = ?",(email,))
+        kullanici_veriler = im.fetchone()
+
+        hosgeldiniztext = ctk.CTkLabel(self.main_manu_ihtiyacsahibi_frame,text=f"Hoşgeldin!\n{karsilama_mesaji()}, {kullanici_veriler[1]}!",font=("Helvatica",20))
+        hosgeldiniztext.place(x=10,y=10)
+
+
+        cikisyap_button = ctk.CTkButton(self.main_manu_ihtiyacsahibi_frame,text="Çıkış\nYap",
+                                        corner_radius=35,
+                                            fg_color="#480685",
+                                            hover_color="#B52EEF",
+                                            border_color="#5D0358",
+                                            border_width=2,)
+        cikisyap_button.place(x=550,y=10)
+        ##############BAĞIŞÇI MENÜ################
+        self.main_manu_bagisci_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
+        im.execute("SELECT * FROM users WHERE email = ?",(email,))
+        kullanici_veriler = im.fetchone()
+
+        hosgeldiniztext = ctk.CTkLabel(self.main_manu_bagisci_frame,text=f"Hoşgeldin!\n{karsilama_mesaji()}, {kullanici_veriler[1]}!",font=("Helvatica",20))
+        hosgeldiniztext.place(x=10,y=10)
+        
+        def yemek_ekle_button():
+            yemek_ekle_window = ctk.CTkToplevel(self.main_manu_bagisci_frame)
+            yemek_ekle_window.geometry("400x300")
+            yemek_ekle_window.resizable(False,False)
+            yemek_ekle_window.title("Fazladan Yemeğim Var")
+
+            yemek_giren_entry = CTkEntry(yemek_ekle_window)
+            yemek_giren_entry.pack()
+            yemek_giren_entry.place(relx=0.5,rely=0.05)
+
+            yemek_giriniz_label=CTkLabel(yemek_ekle_window,text="» Yemek Giriniz:",font=("Arial",16)) 
+            yemek_giriniz_label.pack()   
+            yemek_giriniz_label.place(relx=0.01,rely=0.05)
+
+            kac_tabak_giren_entry = CTkEntry(yemek_ekle_window)
+            kac_tabak_giren_entry.pack()
+            kac_tabak_giren_entry.place( relx=0.5,rely=0.3)
+
+            kac_tabak_label=CTkLabel(yemek_ekle_window,text="» Kaç Tabak Var Giriniz:",font=("Arial",16)) 
+            kac_tabak_label.pack()   
+            kac_tabak_label.place(relx=0.01,rely=0.3)
+
+            def close_window():
+                yemek_ismi = yemek_giren_entry.get()
+                kac_tabak = kac_tabak_giren_entry.get()
+                im.execute("INSERT INTO yemekler VALUES (?,?,?,?,?,?,?)",(CreateFoodID(),yemek_ismi,kullanici_veriler[0],None,kac_tabak,False,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
+                vt.commit()
+                yemek_ekle_window.destroy()
+                
+
+            menuye_don_butonu=CTkButton(yemek_ekle_window,text="Ekle",font=("Arial",16),command=close_window)
+            menuye_don_butonu.pack()
+            menuye_don_butonu.place(relx=0.5,rely=0.7,anchor="center")
+
+        yemek_ekle_button1 = ctk.CTkButton(self.main_manu_bagisci_frame,
+                                           text="Fazladan Yemeğim\nVar",
+                                           corner_radius=35,
+                                            fg_color="#480685",
+                                            hover_color="#B52EEF",
+                                            border_color="#5D0358",
+                                            border_width=2,
+                                           command=yemek_ekle_button)
+        yemek_ekle_button1.place(x=400,y=10)
+
+        cikisyap_button = ctk.CTkButton(self.main_manu_bagisci_frame,text="Çıkış\nYap",
+                                        corner_radius=35,
+                                            fg_color="#480685",
+                                            hover_color="#B52EEF",
+                                            border_color="#5D0358",
+                                            border_width=2)
+                                        #TODO çıkış yapma foknsiyonu
+        cikisyap_button.place(x=550,y=10)
+
+        istatiklerim_label = ctk.CTkLabel(self.main_manu_bagisci_frame,text="İstatiklerim",font=("Arial",14))
+        istatiklerim_label.place(x=10,y=300)
+
+        yemeklerim = ttk.Treeview(self.main_manu_bagisci_frame)
+        yemeklerim["columns"] = ("ID", "Yemek Adı", "Alındı mı")
+
+        yemeklerim.heading("#0", text="ID"),
+        yemeklerim.heading("ID", text="ID")
+        yemeklerim.heading("Yemek Adı", text="Yemek Adı")
+        yemeklerim.heading("Alındı mı", text="Alındı mı")
+
+        ####################################################
         giris = False
         im.execute("SELECT COUNT(*) FROM users")
         satirsayisi = im.fetchone()[0]
@@ -552,6 +670,10 @@ class App(ctk.CTk):
                     self.login_frame.pack_forget()
                     self.geometry(f"{self.main_page_width}x{self.main_page_height}")
                     self.main_manu_ihtiyacsahibi_frame.pack(fill="both", expand=True)
+
+        
+    
+
     ##KAYIT SAYFASINA GECİŞ
     def show_register_page(self):
         self.login_frame.pack_forget()
