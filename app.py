@@ -47,7 +47,19 @@ def getIlceler(sehir):
     for i in ilce:
         ilceler.append(i.capitalize())
     return ilceler
-getIlceler("Manisa")
+
+def iki_sayi_araliga_sigdir(sayi1, min1, max1, min2, max2):
+    try:
+        # İlk aralığı kontrol et
+        if max1 == min1:
+            raise ValueError("İlk aralığın minimum ve maksimum değerleri aynı olamaz.")
+        
+        # Dönüştürme işlemi
+        sonuc = min2 + ((sayi1 - min1) / (max1 - min1)) * (max2 - min2)
+        return sonuc
+    except ValueError as e:
+        return str(e)
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -404,7 +416,7 @@ class App(ctk.CTk):
         
         #######İHTİYAÇ SAHİBİ KAYIT SAYFA 2########
         self.register_page_three_ihtiyacsahibi = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
-        print(id)
+        
         aylık_gelir_soru= CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Aylık gelirinizi çizelgede işaretleyiniz.",font=("Arial",17 ))
         aylık_gelir_soru.place(relx=0.03,rely=0.07)
         aylik_gelir_veri = ctk.IntVar()
@@ -412,7 +424,7 @@ class App(ctk.CTk):
                                           from_=0,
                                           to= 50000,
                                           width=240,
-                                          number_of_steps=5,
+                                          number_of_steps=10,
                                           button_color="#528b8b",
                                           progress_color="#ffffff",
                                           variable=aylik_gelir_veri)
@@ -471,12 +483,32 @@ class App(ctk.CTk):
 
         def complete_register():
             aylik_gelir = aylik_gelir_veri.get()
-            hanede_yasayan_kisi_sayisi = kac_kisi_yasıyor_cevap.get()
-            hastalik = hastalik_var.get()
+            hanede_yasayan_kisi_sayisi = int(kac_kisi_yasıyor_cevap.get())
+            hastalikpuan = int(hastalik_var.get())*35
             ev_tipi = evtipi.get()
 
+            hanede_yasayan_puan,evtipi_puan = 0,0
+            aylik_gelir_puan = iki_sayi_araliga_sigdir(int(aylik_gelir),0,50000,10,100)
+            if hanede_yasayan_kisi_sayisi == 0 or hanede_yasayan_kisi_sayisi == 1:
+                hanede_yasayan_puan = 10
+            elif hanede_yasayan_kisi_sayisi == 2 or hanede_yasayan_kisi_sayisi == 3:
+                hanede_yasayan_puan = 34
+            elif hanede_yasayan_kisi_sayisi >= 4:
+                hanede_yasayan_puan = 50
             
-            
+            if ev_tipi == "Kendi Evim":
+                evtipi_puan = 13
+            elif ev_tipi == "Miras":
+                evtipi_puan = 25
+            elif ev_tipi == "Kira":
+                evtipi_puan = 46
+            elif ev_tipi == "Hibe":
+                evtipi_puan = 67
+
+            toplam_puan = aylik_gelir_puan + hanede_yasayan_puan + evtipi_puan + hastalikpuan
+            im.execute("UPDATE users SET oncelik_puani = ? WHERE id = ?",(toplam_puan,id,))
+            vt.commit()
+
         register_button2 = ctk.CTkButton(self.register_page_three_ihtiyacsahibi,text="Kaydı Tamamla",command=complete_register)
         register_button2.place(x=420,y=310)
         #############MAIN MENU PAGE###########
@@ -524,7 +556,7 @@ class App(ctk.CTk):
             self.title("Kayıt Sayfası | İhtiyaç Sahibi")
             self.register_page_two_ihtiyacsahibi.pack(fill="both", expand=True)
 
-    #KAYITTAN LOGİN SAYFASI GEÇİŞ
+    #BAĞIŞÇI KAYITTAN LOGİN SAYFASI GEÇİŞ
     def login_page_after_registered(self):
         self.register_page_two_bagisci.pack_forget()
         self.geometry(f"{self.login_page_width}x{self.login_page_height}")
@@ -535,7 +567,14 @@ class App(ctk.CTk):
         self.register_page_two_ihtiyacsahibi.pack_forget()
         self.geometry(f"{self.register_page_width}x{self.register_page_height}")
         self.register_page_three_ihtiyacsahibi.pack(fill="both", expand=True)
-        
+    
+    #İHTİYAÇ SAHİBİ KAYITTAN LOGİN GEÇİŞ
+    def login_page_after_registered(self):
+        self.register_page_three_ihtiyacsahibi.pack_forget()
+        self.geometry(f"{self.login_page_width}x{self.login_page_height}")
+        self.login_frame.pack(fill="both", expand=True)
+        self.title("Giriş Sayfası")
+
 if __name__ == "__main__":
     app = App()
     app.mainloop()
