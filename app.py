@@ -5,6 +5,7 @@ import tkinter as tk
 import sqlite3 as sql
 import hashlib
 from PIL import Image
+import random
 
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
@@ -19,6 +20,17 @@ def Encrypte(sifre):
     hashed_password = sha256.hexdigest()
     return hashed_password
 
+def CreateID(table):
+    im.execute(f"SELECT COUNT(*) FROM users")
+    sutun = im.fetchone()[0]
+
+    x = random.randint(11111111,99999999)
+    im.execute(f"SELECT id FROM {table}")
+    for i in range(sutun):
+        veri = im.fetchone()
+        if veri == x:
+            x += 1
+    return x
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -47,24 +59,93 @@ class App(ctk.CTk):
         self.login_email_entry.place(x=200,y=50)
 
         self.login_password_label = ctk.CTkLabel(self.login_frame, text="Şifre: ")
-        self.login_password_label.place(x=120,y=90)
+        self.login_password_label.place(x=136,y=90)
         self.login_password_entry = ctk.CTkEntry(self.login_frame, show="*")
         self.login_password_entry.place(x=200,y=90)
 
-        self.login_button = ctk.CTkButton(self.login_frame,text="Giriş",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=self.login)
+        self.login_button = ctk.CTkButton(self.login_frame,
+                                          text="Giriş",
+                                          corner_radius=35,
+                                          fg_color="#528b8b",
+                                          hover_color="#4158D0",
+                                          border_color="#FFCC70",
+                                          border_width=2,width=100,
+                                          command=self.login)
         self.login_button.place(x=120,y=130)
 
-        self.register_button = ctk.CTkButton(self.login_frame,text="Kayıt Ol",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=self.show_register_page)
+        self.register_button = ctk.CTkButton(self.login_frame,
+                                             text="Kayıt Ol",
+                                             corner_radius=35,
+                                             fg_color="#528b8b",
+                                             hover_color="#4158D0",
+                                             border_color="#FFCC70",
+                                             border_width=2,width=100,
+                                             command=self.show_register_page)
         self.register_button.place(x=240,y=130)
 
         #############REGISTER PAGE ONE ############
-        
+        def checkbox_callback(bagisci, ihtiyacsahibi, id):
+            if id == 1:
+                ihtiyacsahibi.set(0)
+            else:
+                bagisci.set(0)
+
+        bagisci = ctk.IntVar()
+        ihtiyacsahibi = ctk.IntVar()
 
         self.register_page_one = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
-
-        self.bagisci_tik = ctk.CTkCheckBox(self.register_page_one,text="",fg_color="#528b8b",checkbox_height=18,checkbox_width=18,corner_radius=36)
         
+        self.bagisci_tik = ctk.CTkCheckBox(self.register_page_one,
+                                           text="Bağışçı",
+                                           variable=bagisci,
+                                           font=("Arial",20),
+                                           fg_color="#528b8b",
+                                           checkbox_height=80,
+                                           checkbox_width=80,
+                                           corner_radius=36,
+                                           command=lambda: checkbox_callback(bagisci,ihtiyacsahibi, 1))
+        self.bagisci_tik.place(x=100,y=100)
     
+        self.ihtiyacsahibi_tik = ctk.CTkCheckBox(self.register_page_one,
+                                                 variable=ihtiyacsahibi,
+                                                 text="İhtiyaç Sahibi",
+                                                 font=("Arial",20),
+                                                 fg_color="#528b8b",
+                                                 checkbox_height=80,
+                                                 checkbox_width=80,
+                                                 corner_radius=36,
+                                                 command=lambda: checkbox_callback(bagisci,ihtiyacsahibi, 2))
+        self.ihtiyacsahibi_tik.place(x=100,y=200)
+
+        #checkbox veri alma 2. sayfaya geçiş
+        def get_checkbox_data():
+            bagisci_veri = int(bagisci.get())
+            ihtiyacsahibi_veri = int(ihtiyacsahibi.get())
+            if bagisci_veri == 1:
+                self.next_page_to_two(1)
+            elif ihtiyacsahibi == 1:
+                self.next_page_to_two(0)
+
+        self.next_page_to_two_button = ctk.CTkButton(self.register_page_one,
+                                             text="İleri",
+                                             corner_radius=35,
+                                             fg_color="#528b8b",
+                                             hover_color="#4158D0",
+                                             border_color="#FFCC70",
+                                             border_width=2,
+                                             width=100,
+                                             command=get_checkbox_data)
+        self.next_page_to_two_button.place(x=400,y=350)
+        ###KAYIT 2. SAYFA BAĞIŞÇI
+        self.register_page_two_bagisci = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
+
+
+
+
+        ###KAYIT 2. SAYFA BAĞIŞÇI
+        self.register_page_two_ihtiyacsahibi = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
+
+
         #############MAIN MENU PAGE###########
         self.main_manu_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
@@ -90,11 +171,25 @@ class App(ctk.CTk):
                 self.login_frame.pack_forget()
                 self.geometry(f"{self.main_page_width}x{self.main_page_height}")
                 self.main_manu_frame.pack(fill="both", expand=True)
-                
+
+    ##KAYIT SAYFASINA GECİŞ
     def show_register_page(self):
         self.login_frame.pack_forget()
         self.geometry(f"{self.register_page_width}x{self.register_page_height}")
-        self.register_page_one.pack(fill="both", expand=True)  
+        self.title("Kayıt Sayfası")
+        self.register_page_one.pack(fill="both", expand=True)
+
+    #2. KAYIT SAYFASINA GEÇİŞ
+    def next_page_to_two(self,page):
+        self.register_page_one.pack_forget()
+        self.geometry(f"{self.register_page_width}x{self.register_page_height}")
+        if page == 1:
+            self.register_page_two_bagisci.pack(fill="both", expand=True)
+            self.title("Kayıt Sayfası | Bağışçı")
+        if page == 0:
+            self.title("Kayıt Sayfası | İhtiyaç Sahibi")
+            self.register_page_two_ihtiyacsahibi.pack(fill="both", expand=True)
+
 if __name__ == "__main__":
     app = App()
     app.mainloop()
