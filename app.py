@@ -246,6 +246,20 @@ class App(ctk.CTk):
         bagisci_tekrar_sifre_entry= CTkEntry(self.register_page_two_bagisci, show="*")
         bagisci_tekrar_sifre_entry.place(x=90,y=210)
 
+        #Kvkk metnini görmek için tıklayınız butonu
+        def kvkk_ac():
+            kvkk_metin = ctk.CTkToplevel(app)
+            kvkk_metin.title("KVKK Aydınlatma Metni")
+            label = ctk.CTkLabel(kvkk_metin, text="Askıda Yemek olarak müşteri memnuniyetini ön planda tutarak,\nkişisel verilerinizi korumak ve güvenli bir şekilde işlemek için çaba sarf etmekteyiz.\n Kişisel verileriniz, yasal düzenlemelere uygun olarak ve sadece belirli amaçlar doğrultusunda kullanılmaktadır.\n Verileriniz asla izinsiz olarak üçüncü taraflarla paylaşılmamaktadır.\n KVKK kapsamında, kişisel veri sahipleri olarak size aşağıdaki hakları tanıyoruz:\n- Kişisel verilerinizin işlenip işlenmediğini öğrenme,\n- Kişisel verilerinizin işlenme amacını ve bunların amacına uygun kullanılıp kullanılmadığını öğrenme,\n- Kişisel verilerinizin düzeltilmesini veya silinmesini isteme,\n- Kişisel verilerinizin aktarıldığı üçüncü kişileri bilme,\n- İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme.\n Bu haklarınızı kullanmak veya kişisel verilerinizle ilgili herhangi bir sorunuz için [askıdayemek@gmail.com](mailto:askıdayemek@gmail.com) adresine başvurabilirsiniz.")
+            label.pack(pady=20, padx=20)
+    
+            close_button = ctk.CTkButton(kvkk_metin, text="Kapat", command=kvkk_metin.destroy)
+            close_button.pack(pady=10)
+        
+        kvkk_görme_butonu=CTkButton(self.register_page_two_bagisci,text="KVKK metnini görmek için tıklayınız.",font=("Arial",15),command=kvkk_ac)
+        kvkk_görme_butonu.place(relx=0.02 ,rely=0.8)
+
+
         #kvkk onay
         kvkk= CTkLabel(self.register_page_two_bagisci,text="Kullanım şartlarını ve KVKK metnini okuduğumu onaylıyorum",font=("Arial",15 ))
         kvkk.place(relx=0.02,rely=0.71)
