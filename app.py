@@ -54,7 +54,7 @@ class App(ctk.CTk):
         self.login_button = ctk.CTkButton(self.login_frame,text="Giriş",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=self.login)
         self.login_button.place(x=120,y=130)
 
-        self.register_button = ctk.CTkButton(self.login_frame,text="Kayıt Ol",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=show_register_page)
+        self.register_button = ctk.CTkButton(self.login_frame,text="Kayıt Ol",corner_radius=35,fg_color="#528b8b",hover_color="#4158D0",border_color="#FFCC70", border_width=2,width=100,command=self.show_register_page)
         self.register_button.place(x=240,y=130)
 
         #############REGISTER PAGE ONE ############
@@ -64,10 +64,7 @@ class App(ctk.CTk):
 
         self.bagisci_tik = ctk.CTkCheckBox(self.register_page_one,text="",fg_color="#528b8b",checkbox_height=18,checkbox_width=18,corner_radius=36)
         
-        def show_register_page():
-            self.login_frame.pack_forget()
-            self.geometry(f"{self.register_page_width}x{self.register_page_height}")
-            self.register_page_one.pack(fill="both", expand=True)
+    
         #############MAIN MENU PAGE###########
         self.main_manu_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
@@ -93,7 +90,11 @@ class App(ctk.CTk):
                 self.login_frame.pack_forget()
                 self.geometry(f"{self.main_page_width}x{self.main_page_height}")
                 self.main_manu_frame.pack(fill="both", expand=True)
-        
+                
+    def show_register_page(self):
+        self.login_frame.pack_forget()
+        self.geometry(f"{self.register_page_width}x{self.register_page_height}")
+        self.register_page_one.pack(fill="both", expand=True)  
 if __name__ == "__main__":
     app = App()
     app.mainloop()
