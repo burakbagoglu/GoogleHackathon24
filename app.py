@@ -140,7 +140,7 @@ class App(ctk.CTk):
             ihtiyacsahibi_veri = int(ihtiyacsahibi.get())
             if bagisci_veri == 1:
                 self.next_page_to_two(1)
-            elif ihtiyacsahibi == 1:
+            elif ihtiyacsahibi_veri == 1:
                 self.next_page_to_two(0)
 
         self.next_page_to_two_button = ctk.CTkButton(self.register_page_one,
@@ -158,7 +158,7 @@ class App(ctk.CTk):
         
         self.register_page_two_bagisci = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
         
-        #ihtiyacsahibi isim
+        #bağışçı isim
         bagisci_isim= CTkLabel(self.register_page_two_bagisci,text="Ad: ",font=("Arial",13))
         bagisci_isim.place(x=10,y=10)
 
@@ -166,7 +166,7 @@ class App(ctk.CTk):
         bagisci_entry.place(x=90,y=10)
 
 
-        #ihtiyacsahibi soyisim
+        #bağışçı soyisim
         bagisci_soyisim= CTkLabel(self.register_page_two_bagisci,text="Soyisim:",font=("Arial",13))
         bagisci_soyisim.place(x=10,y=50)
 
@@ -174,7 +174,7 @@ class App(ctk.CTk):
         bagisci_soyisim_entry.place(x=90,y=50)
 
 
-        #ihtiyacsahibi eposta
+        #bağışçı eposta
         bagisci_eposta= CTkLabel(self.register_page_two_bagisci,text="E-posta",font=("Arial",13))
         bagisci_eposta.place(x=10,y=90)
 
@@ -211,7 +211,7 @@ class App(ctk.CTk):
         kvkk= CTkLabel(self.register_page_two_bagisci,text="Kullanım şartlarını ve KVKK metnini okuduğumu onaylıyorum",font=("Arial",15 ))
         kvkk.place(relx=0.02,rely=0.71)
 
-        kvkkk = ctk.IntVar()
+        kvkk_deger = ctk.IntVar()
 
 
         kvkk_check=CTkCheckBox(self.register_page_two_bagisci,
@@ -220,7 +220,7 @@ class App(ctk.CTk):
                                checkbox_height=18,
                                checkbox_width=18,
                                corner_radius=36,
-                               variable=kvkkk)
+                               variable=kvkk_deger)
         
         kvkk_check.place(relx=0.81,rely=0.72)
 
@@ -266,13 +266,12 @@ class App(ctk.CTk):
             tc = bagisci_tc_entry.get()
             sifre = bagisci_sifre_entry.get()
             tekrar_sifre = bagisci_tekrar_sifre_entry.get()
-            kvkk = kvkkk.get()
-            if int(kvkk) == 1:
-                if bool(isim) == True and bool(soyisim) == True and bool(eposta) == True and bool(tc) == True and sifre == tekrar_sifre:
-                    im.execute("INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?)",(CreateID(),isim,soyisim,eposta,Encrypte(sifre),tc,1,sehir,ilce,None,))
-                    vt.commit()
-            else:
-                print("KVKK İŞARETLE")
+            kvkk = kvkk_deger.get()
+            
+            if bool(isim) == True and bool(soyisim) == True and bool(eposta) == True and bool(tc) == True and sifre == tekrar_sifre:
+                im.execute("INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?)",(CreateID(),isim,soyisim,eposta,Encrypte(sifre),tc,1,sehir,ilce,None,))
+                vt.commit()
+            
 
         register_button = ctk.CTkButton(self.register_page_two_bagisci,text="Kaydı Tamamla",command=bagisci_register)
         register_button.place(x=420,y=310)
@@ -335,18 +334,18 @@ class App(ctk.CTk):
         kvkk= CTkLabel(self.register_page_two_ihtiyacsahibi,text="Kullanım şartlarını ve KVKK metnini okuduğumu onaylıyorum",font=("Arial",15 ))
         kvkk.place(relx=0.02,rely=0.71)
 
-        kvkkk = ctk.IntVar()
+        kvkkkk = ctk.IntVar()
 
 
-        kvkk_check=CTkCheckBox(self.register_page_two_ihtiyacsahibi,
+        kvkk_checkk=CTkCheckBox(self.register_page_two_ihtiyacsahibi,
                                text="",
                                fg_color="#528b8b",
                                checkbox_height=18,
                                checkbox_width=18,
                                corner_radius=36,
-                               variable=kvkkk)
+                               variable=kvkkkk)
         
-        kvkk_check.place(relx=0.81,rely=0.72)
+        kvkk_checkk.place(relx=0.81,rely=0.72)
 
         canvas = ctk.CTkCanvas(self.register_page_two_ihtiyacsahibi,width=0.05,height=260)
         canvas.place(x=320,y=20)
@@ -382,9 +381,7 @@ class App(ctk.CTk):
                                         variable=combobox_var)
         sehirler_cbox.place(x=340,y=10)
 
-        register_button = ctk.CTkButton(self.register_page_two_bagisci,text="Kaydı Tamamla",command=bagisci_register)
-        register_button.place(x=420,y=310)
-
+        id = CreateID()
         def ihtiyacsahibi_register():
             global sehir,ilce
             isim = ihtiyacsahibi_entry.get()
@@ -393,18 +390,99 @@ class App(ctk.CTk):
             tc = ihtiyacsahibi_tc_entry.get()
             sifre = ihtiyacsahibi_sifre_entry.get()
             tekrar_sifre = ihtiyacsahibi_tekrar_sifre_entry.get()
-            kvkk = kvkkk.get()
-            if int(kvkk) == 1:
-                if bool(isim) == True and bool(soyisim) == True and bool(eposta) == True and bool(tc) == True and sifre == tekrar_sifre:
-                    self.ihtiyacsahibi_page1_to_page2(self)
-            else:
-                print("KVKK İŞARETLE")
+            kvkk = kvkkkk.get()
+            if bool(isim) == True and bool(soyisim) == True and bool(eposta) == True and bool(tc) == True and sifre == tekrar_sifre:
+                im.execute("INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?)",(id,isim,soyisim,eposta,Encrypte(sifre),tc,0,sehir,ilce,None,))
+                vt.commit()
+                
+                self.ihtiyacsahibi_page1_to_page2()
 
 
+        register_button = ctk.CTkButton(self.register_page_two_ihtiyacsahibi,text="İleri",command=ihtiyacsahibi_register)
+        register_button.place(x=420,y=310)
+        
         
         #######İHTİYAÇ SAHİBİ KAYIT SAYFA 2########
         self.register_page_three_ihtiyacsahibi = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
+        print(id)
+        aylık_gelir_soru= CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Aylık gelirinizi çizelgede işaretleyiniz.",font=("Arial",17 ))
+        aylık_gelir_soru.place(relx=0.03,rely=0.07)
+        aylik_gelir_veri = ctk.IntVar()
+        aylık_gelir_soru_slider=CTkSlider(self.register_page_three_ihtiyacsahibi,
+                                          from_=0,
+                                          to= 50000,
+                                          width=240,
+                                          number_of_steps=5,
+                                          button_color="#528b8b",
+                                          progress_color="#ffffff",
+                                          variable=aylik_gelir_veri)
+        
+        aylık_gelir_soru_slider.place(relx=0.6 ,rely=0.08)
 
+        kac_kisi_yasıyor_soru= CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Hanenizde kaç kişi yaşıyor?",font=("Arial",17 ))
+        kac_kisi_yasıyor_soru.place(relx=0.03,rely=0.16)
+
+        kac_kisi_yasıyor_cevap=CTkEntry(self.register_page_three_ihtiyacsahibi)
+        kac_kisi_yasıyor_cevap.place(relx=0.67,rely=0.15)
+
+        sıfır_label=CTkLabel(self.register_page_three_ihtiyacsahibi,text="0",font= ("Arial",16))
+        sıfır_label.place(relx=0.61 ,rely=0.01 )
+
+        onbin_label=CTkLabel(self.register_page_three_ihtiyacsahibi,text="10k",font= ("Arial",13))
+        onbin_label.place(relx=0.67 ,rely=0.01 )
+
+        yirmibin_label=CTkLabel(self.register_page_three_ihtiyacsahibi,text="20k",font= ("Arial",13))
+        yirmibin_label.place(relx=0.75 ,rely=0.01 )
+
+        otuzbin_label=CTkLabel(self.register_page_three_ihtiyacsahibi,text="30k",font= ("Arial",13))
+        otuzbin_label.place(relx=0.82 ,rely=0.01 )
+
+        kırkbin_label=CTkLabel(self.register_page_three_ihtiyacsahibi,text="40k",font= ("Arial",13))
+        kırkbin_label.place(relx=0.89 ,rely=0.01 )
+
+        ellibin_label=CTkLabel(self.register_page_three_ihtiyacsahibi,text="50k",font= ("Arial",13))
+        ellibin_label.place(relx=0.95 ,rely=0.01 )
+
+        ev_soru=CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Oturduğunuz evin durumu nedir?",font=("Arial",17))
+        ev_soru.place(relx=0.03,rely=0.26)
+
+        ev = None
+        def evsoru_callback(choice):
+           global ev
+           ev = str(choice) 
+
+        ev_soru_cevap=CTkComboBox(self.register_page_three_ihtiyacsahibi,
+                                  values=["Kendi Evim","Miras","Kira","Hibe",],
+                                  state="readonly",
+                                  command=evsoru_callback)
+        
+        ev_soru_cevap.place(relx=0.67,rely=0.26)
+
+        engel_hastalık_soru=CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Engeliniz veya hastalığınız var mı?",font=("Arial",17))
+        engel_hastalık_soru.place(relx=0.03,rely=0.35)
+        
+        hastalik_var = ctk.BooleanVar()
+        hastalik = None
+        def hastalik_callback():
+            global hastalik
+            hastalik = bool(hastalik_var.get())
+
+        hastalık_checkbox=CTkCheckBox(self.register_page_three_ihtiyacsahibi,text="",
+                                      fg_color="#528b8b",
+                                      checkbox_height=25,
+                                      checkbox_width=25,
+                                      corner_radius=36,
+                                      command=hastalik_callback,
+                                      variable=hastalik_var)
+        hastalık_checkbox.place(relx=0.78 ,rely=0.36)
+
+        def complete_register():
+            aylik_gelir = aylik_gelir_veri.get()
+            hanede_yasayan_kisi_sayisi = kac_kisi_yasıyor_cevap.get()
+            evtipi = ev
+
+        register_button2 = ctk.CTkButton(self.register_page_three_ihtiyacsahibi,text="Kaydı Tamamla",command=complete_register)
+        register_button2.place(x=420,y=310)
         #############MAIN MENU PAGE###########
         self.main_manu_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
@@ -446,7 +524,7 @@ class App(ctk.CTk):
         if page == 1:
             self.register_page_two_bagisci.pack(fill="both", expand=True)
             self.title("Kayıt Sayfası | Bağışçı")
-        if page == 0:
+        elif page == 0:
             self.title("Kayıt Sayfası | İhtiyaç Sahibi")
             self.register_page_two_ihtiyacsahibi.pack(fill="both", expand=True)
 
@@ -459,9 +537,9 @@ class App(ctk.CTk):
     #İHTİYAÇ SAHİBİ SAYFA 1 -> SAYFA
     def ihtiyacsahibi_page1_to_page2(self):
         self.register_page_two_ihtiyacsahibi.pack_forget()
-        self.geometry(f"{self.login_page_width}x{self.login_page_height}")
+        self.geometry(f"{self.register_page_width}x{self.register_page_height}")
         self.register_page_three_ihtiyacsahibi.pack(fill="both", expand=True)
-
+        
 if __name__ == "__main__":
     app = App()
     app.mainloop()

@@ -15,7 +15,7 @@ aylık_gelir_soru= CTkLabel(master=app,text="⁕ Aylık gelirinizi çizelgede i�
 aylık_gelir_soru.place(relx=0.03,rely=0.07)
 
 
-aylık_gelir_soru_slider=CTkSlider(master=app,from_=0, to= 50000,number_of_steps=5, button_color="#528b8b",progress_color="#ffffff")
+aylık_gelir_soru_slider=CTkSlider(master=app, from_=0, to= 50000,number_of_steps=5, button_color="#528b8b",progress_color="#ffffff")
 aylık_gelir_soru_slider.place(relx=0.6 ,rely=0.08)
 
 
