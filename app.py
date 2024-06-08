@@ -11,6 +11,7 @@ import random
 vt = sql.connect("database.db")
 im = vt.cursor()
 im.execute("CREATE TABLE IF NOT EXISTS users ('id','ad','soyad','durum','ulke','sehir','ilce','oncelik_puanı')")
+im.execute("CREATE TABLE IF NOT EXISTS yemekler ('id','yemek_adi','yemek_sahibi','yemek_alan','kac_tabak')")
 
 app = CTk()
 
@@ -488,7 +489,7 @@ class App(ctk.CTk):
             ev_tipi = evtipi.get()
 
             hanede_yasayan_puan,evtipi_puan = 0,0
-            aylik_gelir_puan = iki_sayi_araliga_sigdir(int(aylik_gelir),0,50000,10,100)
+            aylik_gelir_puan = iki_sayi_araliga_sigdir(int(aylik_gelir),0,50000,100,10)
             if hanede_yasayan_kisi_sayisi == 0 or hanede_yasayan_kisi_sayisi == 1:
                 hanede_yasayan_puan = 10
             elif hanede_yasayan_kisi_sayisi == 2 or hanede_yasayan_kisi_sayisi == 3:
@@ -508,15 +509,22 @@ class App(ctk.CTk):
             toplam_puan = aylik_gelir_puan + hanede_yasayan_puan + evtipi_puan + hastalikpuan
             im.execute("UPDATE users SET oncelik_puani = ? WHERE id = ?",(toplam_puan,id,))
             vt.commit()
+            self.login_page_after_registered()
 
         register_button2 = ctk.CTkButton(self.register_page_three_ihtiyacsahibi,text="Kaydı Tamamla",command=complete_register)
         register_button2.place(x=420,y=310)
-        #############MAIN MENU PAGE###########
-        self.main_manu_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
+        #############BAGIŞÇI MENU PAGE###########
+        self.main_manu_bagisci_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
+        
     
-    
+        ###############İHTİYAÇ SAHİBİ MENÜ##########
+        self.main_manu_ihtiyacsahibi_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
 
+
+
+
+        ###############################################################################################################3
     def login(self):
         email = self.login_email_entry.get()
         password = self.login_password_entry.get()
@@ -534,10 +542,16 @@ class App(ctk.CTk):
             im.execute("SELECT password FROM users WHERE email = ?",(email,))
             hashed_password = im.fetchone()[0]
             if hashed_password == Encrypte(password):
-                self.login_frame.pack_forget()
-                self.geometry(f"{self.main_page_width}x{self.main_page_height}")
-                self.main_manu_frame.pack(fill="both", expand=True)
-
+                im.execute("SELECT durum FROM users WHERE email = ?",(email,))
+                durum = im.fetchone()[0]
+                if durum == 1:
+                    self.login_frame.pack_forget()
+                    self.geometry(f"{self.main_page_width}x{self.main_page_height}")
+                    self.main_manu_bagisci_frame.pack(fill="both", expand=True)
+                elif durum == 0:
+                    self.login_frame.pack_forget()
+                    self.geometry(f"{self.main_page_width}x{self.main_page_height}")
+                    self.main_manu_ihtiyacsahibi_frame.pack(fill="both", expand=True)
     ##KAYIT SAYFASINA GECİŞ
     def show_register_page(self):
         self.login_frame.pack_forget()
