@@ -47,7 +47,7 @@ class App(ctk.CTk):
         self.login_email_entry.place(x=200,y=50)
 
         self.login_password_label = ctk.CTkLabel(self.login_frame, text="Şifre: ")
-        self.login_password_label.place(x=120,y=90)
+        self.login_password_label.place(x=136,y=90)
         self.login_password_entry = ctk.CTkEntry(self.login_frame, show="*")
         self.login_password_entry.place(x=200,y=90)
 
