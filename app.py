@@ -30,6 +30,7 @@ def CreateID(table):
         veri = im.fetchone()
         if veri == x:
             x += 1
+
     return x
 class App(ctk.CTk):
     def __init__(self):
@@ -138,8 +139,62 @@ class App(ctk.CTk):
         self.next_page_to_two_button.place(x=400,y=350)
         ###KAYIT 2. SAYFA BAĞIŞÇI
         self.register_page_two_bagisci = ctk.CTkFrame(self, width=self.register_page_width, height=self.register_page_height)
+        
+        #bağışçı isim
+        bagisci_isim= CTkLabel(self.register_page_two_bagisci,text="Ad: ",font=("Arial",13))
+        bagisci_isim.place(x=10,y=10)
+
+        bagisci_entry= CTkEntry(self.register_page_two_bagisci)
+        bagisci_entry.place(x=90,y=10)
 
 
+        #bağışçı soyisim
+        bagisci_soyisim= CTkLabel(self.register_page_two_bagisci,text="Soyisim:",font=("Arial",13))
+        bagisci_soyisim.place(x=10,y=50)
+
+        bagisci_soyisim_entry= CTkEntry(self.register_page_two_bagisci)
+        bagisci_soyisim_entry.place(x=90,y=50)
+
+
+        #bağışçı eposta
+        bagisci_eposta= CTkLabel(self.register_page_two_bagisci,text="E-posta",font=("Arial",13))
+        bagisci_eposta.place(x=10,y=90)
+
+
+        bagisci_eposta_entry= CTkEntry(self.register_page_two_bagisci)
+        bagisci_eposta_entry.place(x=90,y=90)
+
+        #bagışçı tc
+        bagisci_tc= CTkLabel(self.register_page_two_bagisci,text="TC No.:",font=("Arial",13))
+        bagisci_tc.place(x=10,y=130)
+
+
+        bagisci_tc_entry= CTkEntry(self.register_page_two_bagisci)
+        bagisci_tc_entry.place(x=90,y=130)
+
+
+        #bagisci sifre
+        bagisci_sifre= CTkLabel(self.register_page_two_bagisci,text="Şifre:",font=("Arial",13))
+        bagisci_sifre.place(x=10,y=170)
+
+
+        bagisci_sifre_entry= CTkEntry(self.register_page_two_bagisci, show="*")
+        bagisci_sifre_entry.place(x=90,y=170)
+
+        #bagisci tekrar sifre
+        bagisci_tekrar_sifre= CTkLabel(self.register_page_two_bagisci,text="Tekrar Şifre:",font=("Arial",13))
+        bagisci_tekrar_sifre.place(x=10,y=210)
+
+
+        bagisci_tekrar_sifre_entry= CTkEntry(self.register_page_two_bagisci, show="*")
+        bagisci_tekrar_sifre_entry.place(x=90,y=210)
+
+
+        label9= CTkLabel(self.register_page_two_bagisci,text="Kullanım şartlarını ve KVKK metnini okuduğumu onaylıyorum",font=("Arial",15 ))
+        label9.place(relx=0.02,rely=0.71)
+
+        checkbox=CTkCheckBox(self.register_page_two_bagisci,text="",fg_color="#528b8b",checkbox_height=18,checkbox_width=18,corner_radius=36,)
+        checkbox.place(relx=0.81,rely=0.72)
 
 
         ###KAYIT 2. SAYFA BAĞIŞÇI
