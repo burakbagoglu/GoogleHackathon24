@@ -446,41 +446,37 @@ class App(ctk.CTk):
         ev_soru=CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Oturduğunuz evin durumu nedir?",font=("Arial",17))
         ev_soru.place(relx=0.03,rely=0.26)
 
-        ev = None
-        def evsoru_callback(choice):
-           global ev
-           ev = str(choice) 
+        evtipi = ctk.StringVar()
 
         ev_soru_cevap=CTkComboBox(self.register_page_three_ihtiyacsahibi,
                                   values=["Kendi Evim","Miras","Kira","Hibe",],
                                   state="readonly",
-                                  command=evsoru_callback)
+                                  variable=evtipi)
         
         ev_soru_cevap.place(relx=0.67,rely=0.26)
 
         engel_hastalık_soru=CTkLabel(self.register_page_three_ihtiyacsahibi,text="⁕ Engeliniz veya hastalığınız var mı?",font=("Arial",17))
         engel_hastalık_soru.place(relx=0.03,rely=0.35)
-        
-        hastalik_var = ctk.BooleanVar()
-        hastalik = None
-        def hastalik_callback():
-            global hastalik
-            hastalik = bool(hastalik_var.get())
+
+        hastalik_var = ctk.IntVar()
+
 
         hastalık_checkbox=CTkCheckBox(self.register_page_three_ihtiyacsahibi,text="",
                                       fg_color="#528b8b",
                                       checkbox_height=25,
                                       checkbox_width=25,
                                       corner_radius=36,
-                                      command=hastalik_callback,
                                       variable=hastalik_var)
         hastalık_checkbox.place(relx=0.78 ,rely=0.36)
 
         def complete_register():
             aylik_gelir = aylik_gelir_veri.get()
             hanede_yasayan_kisi_sayisi = kac_kisi_yasıyor_cevap.get()
-            evtipi = ev
+            hastalik = hastalik_var.get()
+            ev_tipi = evtipi.get()
 
+            
+            
         register_button2 = ctk.CTkButton(self.register_page_three_ihtiyacsahibi,text="Kaydı Tamamla",command=complete_register)
         register_button2.place(x=420,y=310)
         #############MAIN MENU PAGE###########
