@@ -1,0 +1,96 @@
+
+int point_gelir
+int gelir_çizelgesinden_gelen_değer
+
+if(gelir_çizelgesinden_gelen_değer = 0)
+{
+point_gelir=5
+}
+
+else if( gelir_çizelgesinden_gelen_değer=10)
+{
+    point_gelir=4
+}
+
+else if( gelir_çizelgesinden_gelen_değer=20)
+{
+    =3
+}
+
+else if( gelir_çizelgesinden_gelen_değer=30)
+{
+    =2
+}
+
+else if( gelir_çizelgesinden_gelen_değer=40)
+{
+   point_gelir =1
+}
+
+
+else if( gelir_çizelgesinden_gelen_değer=50)
+{
+   point_gelir =0
+}
+
+
+//buraya kadar olan slider için olanın algoritması//
+
+int point_kisi
+int kisi_sayısı
+  if<3 |(kisi_sayısı =3)
+  kisi_sayısı{
+   point_hane =2
+ }
+  else if(kisi_sayısı=1)
+  kisi_sayısı{
+   point_hane =1
+}
+else
+ {
+    point_hane=3
+ }
+ //buraya kadar olan kısım entryden gelen değer için olan algoritma//
+
+string selectedValue = comboBox1.SelectedItem.ToString();
+int point_hane
+
+
+if (selectedValue == "Kendi Evim")
+    {
+        point_hane=1
+    }
+    else if (selectedValue == "Miras")
+    {
+       point_hane=2
+    }
+    else if (selectedValue == "Kira")
+    {
+        point_hane=3
+    }
+     else if (selectedValue == "Hibe")
+    {
+        point_hane=4
+    }
+    else
+    {
+        point_hane=4
+    }
+
+//buraya kadar olan kısım evin sahiplik türüne bağlı değişken//
+
+int point_saglık
+
+if (checkBox1.IsChecked == true)
+{
+    point_saglık=1
+} 
+else
+{
+    point_saglık=0
+}
+
+//buraya kadar olan kısım sağlık durumuna bağlı değişken//
+
+
+int total_point= point_gelir + point_hane + point_kisi + point_saglık
