@@ -28,7 +28,7 @@ label2.place(relx=0.7,rely=0.23)
 entry2= CTkEntry(master=app,fg_color=("#ffffff"))
 entry2.place(relx=0.7,rely=0.31)
 
-resim=ImageTk.PhotoImage(Image.open()
-entry1.place(relx=0.03,rely=0.15'))
+resim=ImageTk.PhotoImage(Image.open('images/789.jpeg'))
+entry1.place(relx=0.03,rely=0.15)
 
 app.mainloop()
