@@ -583,17 +583,23 @@ class App(ctk.CTk):
             im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
             for i in range(satirsayisi):
                 a = im.fetchone()
-                alindimi = None
-                if a[5] == 0:
-                    alindimi = "Hayır"
-                elif a[5] == 1:
-                    alindimi = "Evet"
-                yemeklerim.insert("", "end", values=(a[0],a[1],alindimi,a[7]))
+                
+                
+                yemeklerim.insert("", "end", values=(a[0],a[1],a[5],a[7]))
                 
         email = self.login_email_entry.get()
         password = self.login_password_entry.get()
 
         ###############İHTİYAÇ SAHİBİ MENÜ##########
+
+        def sehir_to_guzelyazi(text:str):
+            a = text.split("-")
+            b = []
+            for i in a:
+                b.append(i.capitalize())
+            
+            return " ".join(b)
+        
         self.main_manu_ihtiyacsahibi_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
         im.execute("SELECT * FROM users WHERE email = ?",(email,))
         kullanici_veriler = im.fetchone()
@@ -610,7 +616,46 @@ class App(ctk.CTk):
                                             border_width=2,)
         cikisyap_button.place(x=550,y=10)
 
-        
+        cevremdekiyemekler = ttk.Treeview(self.main_manu_ihtiyacsahibi_frame)
+        cevremdekiyemekler["columns"] = ("ID","Yemek Adı", "Konum","Tarih",)
+
+        cevremdekiyemekler.heading("#0", text="ID")
+        cevremdekiyemekler.heading("ID", text="ID")
+        cevremdekiyemekler.heading("Yemek Adı", text="Yemek Adı")
+        cevremdekiyemekler.heading("Konum", text="Konum")
+        cevremdekiyemekler.heading("Tarih", text="Tarih")
+
+        cevremdekiyemekler.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
+        for column in cevremdekiyemekler["columns"]:
+            cevremdekiyemekler.column(column, width=160, stretch=False)
+        cevremdekiyemekler.pack()
+        cevremdekiyemekler.place(x=10,y=200)
+
+        cevremdekiyemekler_style = ttk.Style()
+        cevremdekiyemekler_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
+        cevremdekiyemekler_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
+        cevremdekiyemekler_style.configure("Treeview", background="black")
+        cevremdekiyemekler_style.configure("Treeview", foreground="black")
+        cevremdekiyemekler_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
+
+        im.execute("SELECT COUNT(*) FROM yemekler")
+        satirsayisi = int(im.fetchone()[0])
+        im.execute("SELECT * FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
+        for i in range(satirsayisi):
+            a = im.fetchone()
+            cevremdekiyemekler.insert("", "end", values=(a[0],a[1],f"{sehir_to_guzelyazi(a[6])}",a[7]))  
+
+        def on_tree_select(event):
+            selected_item = cevremdekiyemekler.selection()[0]  # Seçili öğeyi al
+            values = cevremdekiyemekler.item(selected_item, "values")  # Seçili öğenin değerlerini al
+            print("Seçili değerler:", values)  # Değerleri yazdır
+
+        cevremdekiyemekler.bind("<<TreeviewSelect>>", on_tree_select)
+
+
+        im.execute("SELECT COUNT(*) FROM yemekler")
+        satirsayisi = int(im.fetchone()[0])
+        im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
         ##############BAĞIŞÇI MENÜ################
         self.main_manu_bagisci_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
         im.execute("SELECT * FROM users WHERE email = ?",(email,))
@@ -618,6 +663,7 @@ class App(ctk.CTk):
 
         hosgeldiniztext = ctk.CTkLabel(self.main_manu_bagisci_frame,text=f"Hoşgeldin!\n{karsilama_mesaji()}, {kullanici_veriler[1]}!",font=("Helvatica",20))
         hosgeldiniztext.place(x=10,y=10)
+        
         
         def yemek_ekle_button():
             yemek_ekle_window = ctk.CTkToplevel(self.main_manu_bagisci_frame)
