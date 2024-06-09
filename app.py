@@ -9,6 +9,7 @@ import random
 from datetime import datetime
 from tkinter import ttk, messagebox
 import webbrowser
+
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
 im = vt.cursor()
@@ -88,13 +89,13 @@ def karsilama_mesaji():
     suan_saat = suan.hour
 
     if 5 <= suan_saat < 12:
-        return "Günaydın"
+        return "Günaydın 😊"
     elif 12 <= suan_saat < 18:
-        return "İyi öğlenler"
+        return "İyi öğlenler 😚"
     elif 18 <= suan_saat < 23:
-        return "İyi akşamlar"
+        return "İyi akşamlar 😊"
     else:
-        return "İyi geceler"
+        return "İyi geceler 😴"
     
 class App(ctk.CTk):
     def __init__(self):
@@ -333,6 +334,7 @@ class App(ctk.CTk):
             if bool(isim) == True and bool(soyisim) == True and bool(eposta) == True and bool(tc) == True and sifre == tekrar_sifre:
                 im.execute("INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?)",(CreateID(),isim,soyisim,eposta,Encrypte(sifre),tc,1,sehir,ilce,None,))
                 vt.commit()
+                self.login_page_after_registered()
             
 
         register_button = ctk.CTkButton(self.register_page_two_bagisci,text="Kaydı Tamamla",command=bagisci_register)
@@ -397,7 +399,18 @@ class App(ctk.CTk):
         kvkk.place(relx=0.02,rely=0.71)
 
         kvkkkk = ctk.IntVar()
+        def kvkk_ac():
 
+            kvkk_metin = ctk.CTkToplevel(app)
+            kvkk_metin.title("KVKK Aydınlatma Metni")
+            label = ctk.CTkLabel(kvkk_metin, text="Askıda Yemek olarak müşteri memnuniyetini ön planda tutarak,\nkişisel verilerinizi korumak ve güvenli bir şekilde işlemek için çaba sarf etmekteyiz.\n Kişisel verileriniz, yasal düzenlemelere uygun olarak ve sadece belirli amaçlar doğrultusunda kullanılmaktadır.\n Verileriniz asla izinsiz olarak üçüncü taraflarla paylaşılmamaktadır.\n KVKK kapsamında, kişisel veri sahipleri olarak size aşağıdaki hakları tanıyoruz:\n- Kişisel verilerinizin işlenip işlenmediğini öğrenme,\n- Kişisel verilerinizin işlenme amacını ve bunların amacına uygun kullanılıp kullanılmadığını öğrenme,\n- Kişisel verilerinizin düzeltilmesini veya silinmesini isteme,\n- Kişisel verilerinizin aktarıldığı üçüncü kişileri bilme,\n- İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme.\n Bu haklarınızı kullanmak veya kişisel verilerinizle ilgili herhangi bir sorunuz için [askıdayemek@gmail.com](mailto:askıdayemek@gmail.com) adresine başvurabilirsiniz.")
+            label.pack(pady=20, padx=20)
+    
+            close_button = ctk.CTkButton(kvkk_metin, text="Kapat", command=kvkk_metin.destroy)
+            close_button.pack(pady=10)
+        
+        kvkk_görme_butonu=CTkButton(self.register_page_two_ihtiyacsahibi,text="KVKK metnini görmek için tıklayınız.",font=("Arial",15),command=kvkk_ac)
+        kvkk_görme_butonu.place(relx=0.02 ,rely=0.8)
 
         kvkk_checkk=CTkCheckBox(self.register_page_two_ihtiyacsahibi,
                                text="",
@@ -637,7 +650,8 @@ class App(ctk.CTk):
                 sinir_gosterilecek_sayi = 4
 
             print(sinir_gosterilecek_sayi)
-
+            im.execute("UPDATE yemekler SET yemek_alan = '1' WHERE id = ?",(999669,))
+            vt.commit()
             im.execute("SELECT COUNT(*) FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
             satirsayisi2 = int(im.fetchone()[0])    
             im.execute("SELECT * FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
@@ -649,7 +663,7 @@ class App(ctk.CTk):
                 selected_item = cevremdekiyemekler.selection()[0]  # Seçili öğeyi al
                 values = cevremdekiyemekler.item(selected_item, "values")  # Seçili öğenin değerlerini al
                 
-                vt.commit()
+                
                 def yemegi_al_fonksiyon():
                     
                     yemek_al_window = ctk.CTkToplevel(self.main_manu_ihtiyacsahibi_frame)
@@ -661,7 +675,8 @@ class App(ctk.CTk):
                     print(aaa[0].lower())
                     im.execute("SELECT * FROM sehirler WHERE name = ?",(aaa[0].lower(),))
                     veriler = im.fetchone()
-                    im.execute("UPDATE yemekler SET alindi_mi = '1' WHERE id = ?",(values[0],))
+                    im.execute("UPDATE yemekler SET alindi_mi = '1' WHERE id = ?",(int(values[0]),))
+                    im.execute("UPDATE yemekler SET yemek_alan = ? WHERE id = ?",(kullanici_veriler[0],int(values[0]),))
                     vt.commit()
                     random_lat = random.uniform(float(veriler[2])-0.02,float(veriler[2])+0.01)
                     random_lon = random.uniform(float(veriler[3])-0.02,float(veriler[3])+0.01)
@@ -791,7 +806,7 @@ class App(ctk.CTk):
 
             yemeklerim.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
             for column in yemeklerim["columns"]:
-                yemeklerim.column(column, width=110, stretch=False)
+                yemeklerim.column(column, width=140, stretch=False)
             yemeklerim.pack()
             yemeklerim.place(x=10,y=380)
 
@@ -811,7 +826,11 @@ class App(ctk.CTk):
             im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
             for i in range(satirsayisi1):
                 a = im.fetchone()
-                yemeklerim.insert("", "end", values=(a[0],a[1],a[5],a[7]))   
+                if int(a[5]) == 1:
+                    bbbb = "Evet"
+                elif int(a[5]) == 0:
+                    bbbb = "Hayır"
+                yemeklerim.insert("", "end", values=(a[0],a[1],bbbb,a[7]))   
     ####################################################
         giris = False
         im.execute("SELECT COUNT(*) FROM users")
