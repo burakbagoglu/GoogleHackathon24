@@ -8,6 +8,7 @@ from PIL import Image
 import random
 from datetime import datetime
 from tkinter import ttk, messagebox
+import webbrowser
 ##CREATE DATABASE AND TABLES
 vt = sql.connect("database.db")
 im = vt.cursor()
@@ -582,72 +583,113 @@ class App(ctk.CTk):
                 
         email = self.login_email_entry.get()
         password = self.login_password_entry.get()
-
+        im.execute("SELECT * FROM users WHERE email = ?",(email,))
+        kullanici_veriler = im.fetchone()
+        print(kullanici_veriler)
         ###############İHTİYAÇ SAHİBİ MENÜ##########
-
+        
         def sehir_to_guzelyazi(text:str):
             a = text.split("-")
             b = []
             for i in a:
                 b.append(i.capitalize())
-            
+                
             return " ".join(b)
-        
+            
         self.main_manu_ihtiyacsahibi_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
-        im.execute("SELECT * FROM users WHERE email = ?",(email,))
-        kullanici_veriler = im.fetchone()
-        print(kullanici_veriler)
-        hosgeldiniztext = ctk.CTkLabel(self.main_manu_ihtiyacsahibi_frame,text=f"Hoşgeldin!\n{karsilama_mesaji()}, {kullanici_veriler[1]}!",font=("Helvatica",20))
-        hosgeldiniztext.place(x=10,y=10)
-        ihtiyac_sahibi_puan = int(kullanici_veriler[9])
-
-        cikisyap_button = ctk.CTkButton(self.main_manu_ihtiyacsahibi_frame,text="Çıkış\nYap",
-                                        corner_radius=35,
-                                            fg_color="#480685",
-                                            hover_color="#B52EEF",
-                                            border_color="#5D0358",
-                                            border_width=2,)
-        cikisyap_button.place(x=550,y=10)
-
-        cevremdekiyemekler = ttk.Treeview(self.main_manu_ihtiyacsahibi_frame)
-        cevremdekiyemekler["columns"] = ("ID","Yemek Adı", "Konum","Tarih",)
-
-        cevremdekiyemekler.heading("#0", text="ID")
-        cevremdekiyemekler.heading("ID", text="ID")
-        cevremdekiyemekler.heading("Yemek Adı", text="Yemek Adı")
-        cevremdekiyemekler.heading("Konum", text="Konum")
-        cevremdekiyemekler.heading("Tarih", text="Tarih")
-
-        cevremdekiyemekler.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
-        for column in cevremdekiyemekler["columns"]:
-            cevremdekiyemekler.column(column, width=160, stretch=False)
-        cevremdekiyemekler.pack()
-        cevremdekiyemekler.place(x=10,y=200)
-
-        cevremdekiyemekler_style = ttk.Style()
-        cevremdekiyemekler_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
-        cevremdekiyemekler_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
-        cevremdekiyemekler_style.configure("Treeview", background="black")
-        cevremdekiyemekler_style.configure("Treeview", foreground="black")
-        cevremdekiyemekler_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
-
-        im.execute("SELECT COUNT(*) FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
-        satirsayisi2 = int(im.fetchone()[0])
-        im.execute("SELECT * FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
-        for i in range(satirsayisi2):
-            ab = im.fetchone()
-            cevremdekiyemekler.insert("", "end", values=(ab[0],ab[1],sehir_to_guzelyazi(ab[6]),ab[7]))  
-
-        def on_tree_select(event):
-            selected_item = cevremdekiyemekler.selection()[0]  # Seçili öğeyi al
-            values = cevremdekiyemekler.item(selected_item, "values")  # Seçili öğenin değerlerini al
-            yemegi_al_button = ctk.CTkButton(self.main_manu_ihtiyacsahibi_frame,text=f"Yemeği\nAl\n\n{values[1]}")
-            yemegi_al_button.place(x=550,y=200)
-
-        cevremdekiyemekler.bind("<<TreeviewSelect>>", on_tree_select)
-
-
         
+        if int(kullanici_veriler[6]) == 0:
+            hosgeldiniztext = ctk.CTkLabel(self.main_manu_ihtiyacsahibi_frame,text=f"Hoşgeldin!\n{karsilama_mesaji()}, {kullanici_veriler[1]}!",font=("Helvatica",20))
+            hosgeldiniztext.place(x=10,y=10)
+            ihtiyac_sahibi_puan = int(kullanici_veriler[9])
+
+            cikisyap_button = ctk.CTkButton(self.main_manu_ihtiyacsahibi_frame,text="Çıkış\nYap",
+                                            corner_radius=35,
+                                                fg_color="#480685",
+                                                hover_color="#B52EEF",
+                                                border_color="#5D0358",
+                                                border_width=2,)
+            cikisyap_button.place(x=550,y=10)
+
+            cevremdekiyemekler = ttk.Treeview(self.main_manu_ihtiyacsahibi_frame)
+            cevremdekiyemekler["columns"] = ("ID","Yemek Adı", "Konum","Tarih",)
+
+            cevremdekiyemekler.heading("#0", text="ID")
+            cevremdekiyemekler.heading("ID", text="ID")
+            cevremdekiyemekler.heading("Yemek Adı", text="Yemek Adı")
+            cevremdekiyemekler.heading("Konum", text="Konum")
+            cevremdekiyemekler.heading("Tarih", text="Tarih")
+
+            cevremdekiyemekler.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
+            for column in cevremdekiyemekler["columns"]:
+                cevremdekiyemekler.column(column, width=160, stretch=False)
+            cevremdekiyemekler.pack()
+            cevremdekiyemekler.place(x=10,y=200)
+
+            cevremdekiyemekler_style = ttk.Style()
+            cevremdekiyemekler_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
+            cevremdekiyemekler_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
+            cevremdekiyemekler_style.configure("Treeview", background="black")
+            cevremdekiyemekler_style.configure("Treeview", foreground="black")
+            cevremdekiyemekler_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
+
+            
+            
+            if ihtiyac_sahibi_puan < 70 and ihtiyac_sahibi_puan > 40:
+                sinir_gosterilecek_sayi = 1
+            elif ihtiyac_sahibi_puan >= 70 and ihtiyac_sahibi_puan < 145:
+                sinir_gosterilecek_sayi = random.randint(2,4)
+            elif ihtiyac_sahibi_puan >=145 and ihtiyac_sahibi_puan < 170:
+                sinir_gosterilecek_sayi = random.randint(3,6)
+            else:
+                sinir_gosterilecek_sayi = 4
+
+            print(sinir_gosterilecek_sayi)
+
+            im.execute("SELECT COUNT(*) FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
+            satirsayisi2 = int(im.fetchone()[0])    
+            im.execute("SELECT * FROM yemekler WHERE alindi_mi = ? AND konum = ?",(0,f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",))
+            for i in range(sinir_gosterilecek_sayi):
+                ab = im.fetchone()
+                cevremdekiyemekler.insert("", "end", values=(ab[0],ab[1],sehir_to_guzelyazi(ab[6]),ab[7]))  
+
+            def on_tree_select(event):
+                selected_item = cevremdekiyemekler.selection()[0]  # Seçili öğeyi al
+                values = cevremdekiyemekler.item(selected_item, "values")  # Seçili öğenin değerlerini al
+                
+                def yemegi_al_fonksiyon():
+                    yemek_al_window = ctk.CTkToplevel(self.main_manu_ihtiyacsahibi_frame)
+                    yemek_al_window.geometry("400x300")
+                    yemek_al_window.resizable(False,False)
+                    yemek_al_window.title("Yemek Al") 
+                    
+                    aaa = values[2].split(" ")
+                    print(aaa[0].lower())
+                    im.execute("SELECT * FROM sehirler WHERE name = ?",(aaa[0].lower(),))
+                    veriler = im.fetchone()
+
+                    random_lat = random.uniform(float(veriler[2])-0.02,float(veriler[2])+0.01)
+                    random_lon = random.uniform(float(veriler[3])-0.02,float(veriler[3])+0.01)
+                    im.execute("UPDATE yemekler SET yemek_alan = ? AND alindi_mi = ? WHERE id = ?",(kullanici_veriler[0],1,values[0]))
+                    vt.commit()
+                    
+                    def open_link():
+                        link = f"https://www.google.com/maps/@{random_lat},{random_lon},16.5z?hl=tr&entry=ttu&markers={random_lat},{random_lon}"
+                        yeni_link = f"https://www.google.com/maps/search/{random_lat},{random_lon}?entry=tts&g_ep=EgoyMDI0MDYwNS4wKgBIAVAD"
+                        webbrowser.open_new_tab(yeni_link)
+
+                    label = ctk.CTkLabel(yemek_al_window,text="Yemeği başarıyla aldınız! Yol takibi için:")
+                    label.place(x=10,y=10)
+
+                    button =CTkButton(yemek_al_window, text="Linke Git", command=open_link)
+                    button.place(x=10,y=100)
+                yemegi_al_button = ctk.CTkButton(self.main_manu_ihtiyacsahibi_frame,text=f"Yemeği\nAl\n\n{values[1]}",command=yemegi_al_fonksiyon)
+                yemegi_al_button.place(x=550,y=200)
+
+            cevremdekiyemekler.bind("<<TreeviewSelect>>", on_tree_select)
+
+
+            
         ##############BAĞIŞÇI MENÜ################
         self.main_manu_bagisci_frame = ctk.CTkFrame(self,width=self.main_page_width,height=self.main_page_height)
         im.execute("SELECT * FROM users WHERE email = ?",(email,))
@@ -656,77 +698,116 @@ class App(ctk.CTk):
         hosgeldiniztext = ctk.CTkLabel(self.main_manu_bagisci_frame,text=f"Hoşgeldin!\n{karsilama_mesaji()}, {kullanici_veriler[1]}!",font=("Helvatica",20))
         hosgeldiniztext.place(x=10,y=10)
         
-        
-        def yemek_ekle_button():
-            yemek_ekle_window = ctk.CTkToplevel(self.main_manu_bagisci_frame)
-            yemek_ekle_window.geometry("400x300")
-            yemek_ekle_window.resizable(False,False)
-            yemek_ekle_window.title("Fazladan Yemeğim Var")
+        if int(kullanici_veriler[6]) == 1:
+            def yemek_ekle_button():
+                yemek_ekle_window = ctk.CTkToplevel(self.main_manu_bagisci_frame)
+                yemek_ekle_window.geometry("400x300")
+                yemek_ekle_window.resizable(False,False)
+                yemek_ekle_window.title("Fazladan Yemeğim Var")
 
-            yemek_giren_entry = CTkEntry(yemek_ekle_window)
-            yemek_giren_entry.pack()
-            yemek_giren_entry.place(relx=0.5,rely=0.05)
+                yemek_giren_entry = CTkEntry(yemek_ekle_window)
+                yemek_giren_entry.pack()
+                yemek_giren_entry.place(relx=0.5,rely=0.05)
 
-            yemek_giriniz_label=CTkLabel(yemek_ekle_window,text="» Yemek Giriniz:",font=("Arial",16)) 
-            yemek_giriniz_label.pack()   
-            yemek_giriniz_label.place(relx=0.01,rely=0.05)
+                yemek_giriniz_label=CTkLabel(yemek_ekle_window,text="» Yemek Giriniz:",font=("Arial",16)) 
+                yemek_giriniz_label.pack()   
+                yemek_giriniz_label.place(relx=0.01,rely=0.05)
 
-            kac_tabak_giren_entry = CTkEntry(yemek_ekle_window)
-            kac_tabak_giren_entry.pack()
-            kac_tabak_giren_entry.place( relx=0.5,rely=0.3)
+                kac_tabak_giren_entry = CTkEntry(yemek_ekle_window)
+                kac_tabak_giren_entry.pack()
+                kac_tabak_giren_entry.place( relx=0.5,rely=0.3)
 
-            kac_tabak_label=CTkLabel(yemek_ekle_window,text="» Kaç Tabak Var Giriniz:",font=("Arial",16)) 
-            kac_tabak_label.pack()   
-            kac_tabak_label.place(relx=0.01,rely=0.3)
+                kac_tabak_label=CTkLabel(yemek_ekle_window,text="» Kaç Tabak Var Giriniz:",font=("Arial",16)) 
+                kac_tabak_label.pack()   
+                kac_tabak_label.place(relx=0.01,rely=0.3)
 
-            def close_window():
-                yemek_ismi = yemek_giren_entry.get()
-                kac_tabak = kac_tabak_giren_entry.get()
-                im.execute("INSERT INTO yemekler VALUES (?,?,?,?,?,?,?,?)",(CreateFoodID(),
-                                                                          yemek_ismi,
-                                                                          kullanici_veriler[0],
-                                                                          None,
-                                                                          kac_tabak,
-                                                                          False,
-                                                                          f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",
-                                                                          TarihiCek(),
-                                                                          ))
-                vt.commit()
-                yemek_ekle_window.destroy()
+                def close_window():
+                    yemek_ismi = yemek_giren_entry.get()
+                    kac_tabak = kac_tabak_giren_entry.get()
+                    im.execute("INSERT INTO yemekler VALUES (?,?,?,?,?,?,?,?)",(CreateFoodID(),
+                                                                            yemek_ismi,
+                                                                            kullanici_veriler[0],
+                                                                            None,
+                                                                            kac_tabak,
+                                                                            False,
+                                                                            f"{kullanici_veriler[7]}-{kullanici_veriler[8]}",
+                                                                            TarihiCek(),
+                                                                            ))
+                    vt.commit()
+                    yemek_ekle_window.destroy()
+                    
+                    
+
+                menuye_don_butonu=CTkButton(yemek_ekle_window,text="Ekle",font=("Arial",16),command=close_window)
+                menuye_don_butonu.pack()
+                menuye_don_butonu.place(relx=0.5,rely=0.7,anchor="center")
+
+            yemek_ekle_button1 = ctk.CTkButton(self.main_manu_bagisci_frame,
+                                            text="Fazladan Yemeğim\nVar",
+                                            corner_radius=35,
+                                                fg_color="#480685",
+                                                hover_color="#B52EEF",
+                                                border_color="#5D0358",
+                                                border_width=2,
+                                            command=yemek_ekle_button)
+            yemek_ekle_button1.place(x=400,y=10)
+
+            cikisyap_button = ctk.CTkButton(self.main_manu_bagisci_frame,text="Çıkış\nYap",
+                                            corner_radius=35,
+                                                fg_color="#480685",
+                                                hover_color="#B52EEF",
+                                                border_color="#5D0358",
+                                                border_width=2)
+                                            #TODO çıkış yapma foknsiyonu 
+            cikisyap_button.place(x=550,y=10)
+            urun_ekle_canvas = ctk.CTkCanvas(self.main_manu_bagisci_frame,width=1000, height=0.1)
+            urun_ekle_canvas.pack()
+            urun_ekle_canvas.place(x=0,y=310)
+            istatiklerim_label = ctk.CTkLabel(self.main_manu_bagisci_frame,text="İstatiklerim",font=("Arial",24))
+            istatiklerim_label.place(x=10,y=260)
+
+            
+
+            
+
+            def clear_treeview():
+                # Treeview içindeki tüm öğeleri silme
+                for item in yemeklerim.get_children():
+                    yemeklerim.delete(item)
+            
+                yemeklerim = ttk.Treeview(self.main_manu_bagisci_frame)
+                yemeklerim["columns"] = ("ID", "Yemek Adı", "Alındı mı","Tarih")
+
+                yemeklerim.heading("#0", text="ID"),
+                yemeklerim.heading("ID", text="ID")
+                yemeklerim.heading("Yemek Adı", text="Yemek Adı")
+                yemeklerim.heading("Alındı mı", text="Alındı mı")
+                yemeklerim.heading("Tarih", text="Tarih")
+
+                yemeklerim.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
+                for column in yemeklerim["columns"]:
+                    yemeklerim.column(column, width=110, stretch=False)
+                yemeklerim.pack()
+                yemeklerim.place(x=10,y=380)
+
+                yemeklerim_style = ttk.Style()
+                yemeklerim_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
+                yemeklerim_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
+                yemeklerim_style.configure("Treeview", background="black")
+                yemeklerim_style.configure("Treeview", foreground="black")
+                yemeklerim_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
+
+                im.execute("SELECT COUNT(*) FROM yemekler")
+                satirsayisi = int(im.fetchone()[0])
+                im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
                 
-                
-
-            menuye_don_butonu=CTkButton(yemek_ekle_window,text="Ekle",font=("Arial",16),command=close_window)
-            menuye_don_butonu.pack()
-            menuye_don_butonu.place(relx=0.5,rely=0.7,anchor="center")
-
-        yemek_ekle_button1 = ctk.CTkButton(self.main_manu_bagisci_frame,
-                                           text="Fazladan Yemeğim\nVar",
-                                           corner_radius=35,
-                                            fg_color="#480685",
-                                            hover_color="#B52EEF",
-                                            border_color="#5D0358",
-                                            border_width=2,
-                                           command=yemek_ekle_button)
-        yemek_ekle_button1.place(x=400,y=10)
-
-        cikisyap_button = ctk.CTkButton(self.main_manu_bagisci_frame,text="Çıkış\nYap",
-                                        corner_radius=35,
-                                            fg_color="#480685",
-                                            hover_color="#B52EEF",
-                                            border_color="#5D0358",
-                                            border_width=2)
-                                        #TODO çıkış yapma foknsiyonu 
-        cikisyap_button.place(x=550,y=10)
-        urun_ekle_canvas = ctk.CTkCanvas(self.main_manu_bagisci_frame,width=1000, height=0.1)
-        urun_ekle_canvas.pack()
-        urun_ekle_canvas.place(x=0,y=310)
-        istatiklerim_label = ctk.CTkLabel(self.main_manu_bagisci_frame,text="İstatiklerim",font=("Arial",24))
-        istatiklerim_label.place(x=10,y=260)
-
-        
-
-        ####################################################
+                im.execute("SELECT COUNT(*) FROM yemekler")
+                satirsayisi1 = int(im.fetchone()[0])
+                im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
+                for i in range(satirsayisi1):
+                    a = im.fetchone()
+                    yemeklerim.insert("", "end", values=(a[0],a[1],a[5],a[7]))   
+    ####################################################
         giris = False
         im.execute("SELECT COUNT(*) FROM users")
         satirsayisi3 = im.fetchone()[0]
@@ -750,45 +831,6 @@ class App(ctk.CTk):
                     self.login_frame.pack_forget()
                     self.geometry(f"{self.main_page_width}x{self.main_page_height}")
                     self.main_manu_ihtiyacsahibi_frame.pack(fill="both", expand=True)
-
-        def clear_treeview():
-            # Treeview içindeki tüm öğeleri silme
-            for item in yemeklerim.get_children():
-                yemeklerim.delete(item)
-        if int(kullanici_veriler[6]) == 1:
-            yemeklerim = ttk.Treeview(self.main_manu_bagisci_frame)
-            yemeklerim["columns"] = ("ID", "Yemek Adı", "Alındı mı","Tarih")
-
-            yemeklerim.heading("#0", text="ID"),
-            yemeklerim.heading("ID", text="ID")
-            yemeklerim.heading("Yemek Adı", text="Yemek Adı")
-            yemeklerim.heading("Alındı mı", text="Alındı mı")
-            yemeklerim.heading("Tarih", text="Tarih")
-
-            yemeklerim.column("#0", width=0, stretch=False)  # ID sütunu genişliği 0 ve esnetilemez olarak ayarlandı
-            for column in yemeklerim["columns"]:
-                yemeklerim.column(column, width=110, stretch=False)
-            yemeklerim.pack()
-            yemeklerim.place(x=10,y=380)
-
-            yemeklerim_style = ttk.Style()
-            yemeklerim_style.configure("Treeview.Heading", anchor="center")  # Başlıkları ortala
-            yemeklerim_style.configure("Treeview", rowheight=40,font=("Helvetica", 12))  # Satır yüksekliğini ayarla
-            yemeklerim_style.configure("Treeview", background="black")
-            yemeklerim_style.configure("Treeview", foreground="black")
-            yemeklerim_style.configure("Treeview.Cell", anchor="center")  # Hücre metinlerini ortala
-
-            im.execute("SELECT COUNT(*) FROM yemekler")
-            satirsayisi = int(im.fetchone()[0])
-            im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
-            
-            im.execute("SELECT COUNT(*) FROM yemekler")
-            satirsayisi1 = int(im.fetchone()[0])
-            im.execute("SELECT * FROM yemekler WHERE yemek_sahibi = ?",(kullanici_veriler[0],))
-            for i in range(satirsayisi1):
-                a = im.fetchone()
-                yemeklerim.insert("", "end", values=(a[0],a[1],a[5],a[7]))   
-
     ##KAYIT SAYFASINA GECİŞ
     def show_register_page(self):
         self.login_frame.pack_forget()
