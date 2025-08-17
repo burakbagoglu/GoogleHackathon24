@@ -1,0 +1,1 @@
+Eskişehir GDG kulübünün düzenlediği Hackathon'a katıldık. Ekmek alma durumu olmayan insanlar için olan askıda ekmeği, askıda yemek için düşündük. Uygulama CustomTkinter kütüphanesi ile yazıldı. Database için SQLite3 kullandık. 
